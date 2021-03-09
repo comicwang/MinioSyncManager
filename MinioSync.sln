@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31019.35
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinioSyncCore", "MinioSync\MinioSyncCore.csproj", "{4B43ABC0-928B-4DFA-A14A-7255B66CFFFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinioSyncManager", "MinioSyncManager\MinioSyncManager.csproj", "{FB25A0A5-E357-4170-AAAE-198F8E60A700}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4B43ABC0-928B-4DFA-A14A-7255B66CFFFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B43ABC0-928B-4DFA-A14A-7255B66CFFFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B43ABC0-928B-4DFA-A14A-7255B66CFFFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B43ABC0-928B-4DFA-A14A-7255B66CFFFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB25A0A5-E357-4170-AAAE-198F8E60A700}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB25A0A5-E357-4170-AAAE-198F8E60A700}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB25A0A5-E357-4170-AAAE-198F8E60A700}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB25A0A5-E357-4170-AAAE-198F8E60A700}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5BD9EF33-18C9-4A1B-8B96-EB1A1EDDDA68}
+	EndGlobalSection
+EndGlobal
