@@ -599,7 +599,7 @@ namespace MinioSyncManager
 
         private void SetExcuteEnable()
         {
-            btnExcute.Enabled = (radioButton4.Checked == false || (radioButton4.Checked && !string.IsNullOrEmpty(txtSourcePath.Text))) && (radioButton5.Checked == false || (radioButton5.Checked && !string.IsNullOrEmpty(txtBuckupPath.Text) && File.Exists(txtBuckupPath.Text))) && (radioButton6.Checked == false || (radioButton6.Checked && !string.IsNullOrEmpty(txtTargetUri.Text) && !string.IsNullOrEmpty(txtTargetUser.Text) && !string.IsNullOrEmpty(txtTargetPwd.Text)));
+            btnExcute.Enabled = (radioButton4.Checked == false || (radioButton4.Checked && !string.IsNullOrEmpty(txtSourcePath.Text))) && (radioButton5.Checked == false || (radioButton5.Checked && !string.IsNullOrEmpty(txtBuckupPath.Text) && Directory.Exists(txtBuckupPath.Text))) && (radioButton6.Checked == false || (radioButton6.Checked && !string.IsNullOrEmpty(txtTargetUri.Text) && !string.IsNullOrEmpty(txtTargetUser.Text) && !string.IsNullOrEmpty(txtTargetPwd.Text)));
 
             btnTest.Enabled = !string.IsNullOrEmpty(txtTargetUri.Text) && !string.IsNullOrEmpty(txtTargetUser.Text) && !string.IsNullOrEmpty(txtTargetPwd.Text);
         }
