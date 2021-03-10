@@ -46,6 +46,7 @@ namespace MinioSyncManager
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.btnExcute = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.btnChecked = new System.Windows.Forms.Button();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.btnTest = new System.Windows.Forms.Button();
@@ -75,7 +76,6 @@ namespace MinioSyncManager
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.btnChecked = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -167,7 +167,6 @@ namespace MinioSyncManager
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(836, 25);
             this.textBox1.TabIndex = 1;
-            this.textBox1.Text = "http://lsm.cigem.cn:8029";
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // label1
@@ -273,6 +272,18 @@ namespace MinioSyncManager
             this.groupBox4.TabIndex = 2;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "同步方式";
+            // 
+            // btnChecked
+            // 
+            this.btnChecked.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnChecked.Enabled = false;
+            this.btnChecked.Location = new System.Drawing.Point(25, 130);
+            this.btnChecked.Name = "btnChecked";
+            this.btnChecked.Size = new System.Drawing.Size(90, 26);
+            this.btnChecked.TabIndex = 2;
+            this.btnChecked.Text = "检测";
+            this.btnChecked.UseVisualStyleBackColor = true;
+            this.btnChecked.Click += new System.EventHandler(this.btnChecked_Click);
             // 
             // linkLabel1
             // 
@@ -570,18 +581,6 @@ namespace MinioSyncManager
             this.toolStripStatusLabel5.Name = "toolStripStatusLabel5";
             this.toolStripStatusLabel5.Size = new System.Drawing.Size(114, 20);
             this.toolStripStatusLabel5.Text = "下次同步时间：";
-            // 
-            // btnChecked
-            // 
-            this.btnChecked.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnChecked.Enabled = false;
-            this.btnChecked.Location = new System.Drawing.Point(25, 130);
-            this.btnChecked.Name = "btnChecked";
-            this.btnChecked.Size = new System.Drawing.Size(90, 26);
-            this.btnChecked.TabIndex = 2;
-            this.btnChecked.Text = "检测";
-            this.btnChecked.UseVisualStyleBackColor = true;
-            this.btnChecked.Click += new System.EventHandler(this.btnChecked_Click);
             // 
             // FormMain
             // 
