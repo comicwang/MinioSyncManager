@@ -244,7 +244,7 @@ namespace MinioSyncManager
                 buckets[] targertBuckets = _tragetrestApi.GetBuckets();
                 DateTime dateTime = DateTime.MinValue;
                 int current = 0;
-
+                _currentTargetResults = new List<DocResult>();
                 //所有文件
                 if (excuteData.pathAll)
                 {
@@ -264,10 +264,16 @@ namespace MinioSyncManager
                                 _tragetrestApi.SetBucketPolicy(item.name, policy.policy);
                             }
                         }
+                        else
+                        {
+                            var tempObjs = _tragetrestApi.GetObjects(item.name, string.Empty);
+                            if (tempObjs != null && tempObjs.Length > 0)
+                                _currentTargetResults.AddRange(tempObjs.Where(t => t.contentType != ""));
+                        }
                         //获取桶下所有文件信息
                         DocResult[] docResults = _restApi.GetObjects(item.name, string.Empty);
                         _fileCount += docResults.Where(t => t.contentType != "").Count();
-
+                      
                         foreach (var docResult in docResults)
                         {
                             SyncDoc(item.name, docResult, ref current, ref dateTime);
@@ -299,6 +305,12 @@ namespace MinioSyncManager
                             _tragetrestApi.SetBucketPolicy(strs[0], policy.policy);
                         }
                     }
+                    else
+                    {
+                        var tempObjs = _tragetrestApi.GetObjects(strs[0], prifix);
+                        if (tempObjs != null && tempObjs.Length > 0)
+                            _currentTargetResults.AddRange(tempObjs.Where(t => t.contentType != ""));
+                    }
                     DocResult[] docResults = _restApi.GetObjects(strs[0], prifix);
                     _fileCount += docResults.Where(t => t.contentType != "").Count();
                     foreach (var docResult in docResults)
@@ -312,7 +324,7 @@ namespace MinioSyncManager
 
         private int _fileCount = 0;
 
-        private DocResult[] _currentTargetResults = null;
+        private List<DocResult> _currentTargetResults = new List<DocResult>();
 
         /// <summary>
         /// 递归迁移处理Doc
@@ -340,7 +352,9 @@ namespace MinioSyncManager
                         }
                     }
                     DocResult[] results = _restApi.GetObjects(bucketName, docResult.name);
-                    _currentTargetResults = _tragetrestApi.GetObjects(bucketName, docResult.name);
+                    var tempObjs = _tragetrestApi.GetObjects(bucketName, docResult.name);
+                    if (tempObjs != null && tempObjs.Length > 0)
+                        _currentTargetResults.AddRange(tempObjs.Where(t => t.contentType != ""));
                     //文件时间比较
                     if (_excuteData.modelAll == false)
                         results = results.Where(t => t.contentType == "" || (t.lastModified.AddHours(8) > LatestSyncTime && t.contentType != "")).ToArray();
@@ -362,6 +376,7 @@ namespace MinioSyncManager
                 //判断文件是否存在
                 if (_currentTargetResults != null && _currentTargetResults.Any(t => t.name == docResult.name && t.size == docResult.size))
                 {
+                    _currentTargetResults.RemoveAll(t => t.name == docResult.name);
                     //已经存在，跳过同步
                 }
                 else
@@ -370,7 +385,21 @@ namespace MinioSyncManager
                     {
                         backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"开始上传文件{docResult.name}（{total}/{_fileCount}）");
                         Stream stream = _restApi.GetFileStream(bucketName, docResult.name);
-                        _tragetrestApi.UploadFile(bucketName, docResult.name, docResult.contentType, stream);
+                        string response = _tragetrestApi.UploadFile(bucketName, docResult.name, docResult.contentType, stream);
+                        if (response == "")
+                            backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{docResult.name}上传完成（{total}/{_fileCount}）");
+                        //兼容超时问题，下载文件再上传
+                        else
+                        {
+                            backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{docResult.name}上传失败:{response},开始尝试本地下载上传方式（{total}/{_fileCount}）");
+                            string tmp = CreateTempPath(bucketName, docResult.name);
+                            _restApi.DownloadFile(bucketName, docResult.name, tmp);
+                            response = _tragetrestApi.UploadFile(bucketName, docResult.name, docResult.contentType, tmp);
+                            if (response == "")
+                                backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{docResult.name}上传完成（{total}/{_fileCount}）");
+                            else
+                                backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{docResult.name}上传失败:{response}（{total}/{_fileCount}）");
+                        }
                         if (dateTime < docResult.lastModified.AddHours(8))
                             dateTime = docResult.lastModified.AddHours(8);
                     }
@@ -443,6 +472,24 @@ namespace MinioSyncManager
                     }
                 }
             }
+        }
+
+        private string CreateTempPath(string bucketName, string fullName)
+        {
+            string[] forlders = fullName.Split('/');
+            string tempPath = Path.Combine(Path.GetTempPath(), bucketName);
+            if (Directory.Exists(tempPath) == false)
+                Directory.CreateDirectory(tempPath);
+            for (int i = 0; i < forlders.Length - 1; i++)
+            {
+                tempPath = Path.Combine(tempPath, forlders[i]);
+                if (Directory.Exists(tempPath) == false)
+                {
+                    Directory.CreateDirectory(tempPath);
+                }
+            }
+            tempPath = Path.Combine(tempPath, forlders[forlders.Length - 1]);
+            return tempPath;
         }
 
         private string CreatePath(string bucketName, string fullName)

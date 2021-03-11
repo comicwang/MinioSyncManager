@@ -142,12 +142,13 @@ namespace MinioSyncCore
         /// <param name="path"></param>
         /// <param name="contentType"></param>
         /// <param name="stream">minio文件流</param>
-        public void UploadFile(string bucketName, string path, string contentType,Stream stream)
+        public string UploadFile(string bucketName, string path, string contentType,Stream stream)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"{_uri}/minio/upload/{bucketName}/{path}");
             request.Method = "PUT";
             request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36";
             request.Headers["Authorization"] = $"Bearer {_token}";
+            request.Timeout = 60000;
             request.ContentType = contentType;
 
             using (stream)
@@ -175,6 +176,7 @@ namespace MinioSyncCore
                         }
                         if (responseData.Contains("error"))
                             throw new InvalidOperationException(responseData);
+                        return responseData;
                     }
                 }
                 catch (System.Net.WebException ex)
@@ -182,8 +184,9 @@ namespace MinioSyncCore
                     if (ex.Status == WebExceptionStatus.ProtocolError && ex.Message.Contains("401"))
                     {
                         SetToken();
-                        UploadFile(bucketName, path, contentType,stream);
+                        return UploadFile(bucketName, path, contentType,stream);
                     }
+                    return ex.Message;
                 }
             }
         }
@@ -195,7 +198,7 @@ namespace MinioSyncCore
         /// <param name="path"></param>
         /// <param name="contentType"></param>
         /// <param name="uploadPath"></param>
-        public void UploadFile(string bucketName, string path, string contentType,string uploadPath)
+        public string UploadFile(string bucketName, string path, string contentType,string uploadPath)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"{_uri}/minio/upload/{bucketName}/{path}");
             request.Method = "PUT";
@@ -206,7 +209,7 @@ namespace MinioSyncCore
             {
                 throw new InvalidOperationException("上传文件路径不正确");
             }
-            using (FileStream fileStream=new FileStream(uploadPath,FileMode.Open))
+            using (FileStream fileStream = new FileStream(uploadPath, FileMode.Open))
             {
                 byte[] buffer = new byte[1024];
                 int bytesRead = 0;
@@ -231,6 +234,7 @@ namespace MinioSyncCore
                         }
                         if (responseData.Contains("error"))
                             throw new InvalidOperationException(responseData);
+                        return responseData;
                     }
                 }
                 catch (System.Net.WebException ex)
@@ -238,8 +242,9 @@ namespace MinioSyncCore
                     if (ex.Status == WebExceptionStatus.ProtocolError && ex.Message.Contains("401"))
                     {
                         SetToken();
-                        UploadFile(bucketName,path,contentType,uploadPath);
+                        return UploadFile(bucketName, path, contentType, uploadPath);
                     }
+                    return ex.Message;
                 }
             }
         }
