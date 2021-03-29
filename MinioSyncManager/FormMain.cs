@@ -32,7 +32,9 @@ namespace MinioSyncManager
             }
             buckets[] bucks = _restApi.GetBuckets();
             if (bucks.Length > 0)
-                btnExcute.Enabled = true;
+            {
+                SetExcuteEnable();
+            };
             treeView1.Nodes.Clear();
 
             foreach (var item in bucks)
@@ -385,7 +387,7 @@ namespace MinioSyncManager
                     {
                         backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"开始上传文件{docResult.name}（{total}/{_fileCount}）");
                         Stream stream = _restApi.GetFileStream(bucketName, docResult.name);
-                        string response = _tragetrestApi.UploadFile(bucketName, docResult.name, docResult.contentType, stream);
+                        string response = _tragetrestApi.UploadFile(bucketName, docResult.name, docResult.contentType, stream,docResult.size);
                         if (response == "")
                             backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{docResult.name}上传完成（{total}/{_fileCount}）");
                         //兼容超时问题，下载文件再上传
@@ -558,7 +560,6 @@ namespace MinioSyncManager
             groupBox6.Enabled = radioButton2.Checked;
         }
 
-
         /// <summary>
         /// 维护最近同步日期
         /// </summary>
@@ -590,7 +591,6 @@ namespace MinioSyncManager
                     File.Delete(configPath);
                 File.WriteAllLines(configPath, new string[] { value.ToString("yyyy-MM-dd HH:mm:ss") });
                 latesSyncTime = value;
-                btnChecked.Enabled = latesSyncTime > DateTime.MinValue;
             }
         }
 
@@ -619,15 +619,12 @@ namespace MinioSyncManager
 
             toolStripStatusLabel3.Text = $"上次同步时间:{LatestSyncTime.ToString("yyyy-MM-dd HH:mm:ss")}";
             button1.Enabled = !string.IsNullOrEmpty(textBox1.Text) && !string.IsNullOrEmpty(textBox2.Text) && !string.IsNullOrEmpty(textBox3.Text);
-            btnChecked.Enabled = LatestSyncTime > DateTime.MinValue;
         }
 
         private void TimerLog_Tick(object sender, EventArgs e)
         {
             textBox9.AppendLog2File();
         }
-
-
 
         private void Timer_Tick1(object sender, EventArgs e)
         {
@@ -647,7 +644,7 @@ namespace MinioSyncManager
         private void SetExcuteEnable()
         {
             btnExcute.Enabled = (radioButton4.Checked == false || (radioButton4.Checked && !string.IsNullOrEmpty(txtSourcePath.Text))) && (radioButton5.Checked == false || (radioButton5.Checked && !string.IsNullOrEmpty(txtBuckupPath.Text) && Directory.Exists(txtBuckupPath.Text))) && (radioButton6.Checked == false || (radioButton6.Checked && !string.IsNullOrEmpty(txtTargetUri.Text) && !string.IsNullOrEmpty(txtTargetUser.Text) && !string.IsNullOrEmpty(txtTargetPwd.Text)));
-
+            btnChecked.Enabled = btnExcute.Enabled;
             btnTest.Enabled = !string.IsNullOrEmpty(txtTargetUri.Text) && !string.IsNullOrEmpty(txtTargetUser.Text) && !string.IsNullOrEmpty(txtTargetPwd.Text);
         }
 

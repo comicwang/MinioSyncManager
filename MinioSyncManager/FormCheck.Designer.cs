@@ -32,18 +32,16 @@ namespace MinioSyncManager
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormCheck));
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.label1 = new System.Windows.Forms.Label();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.path = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.sourceSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.checkPath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.checkSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.result = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox2.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // backgroundWorker1
@@ -58,41 +56,12 @@ namespace MinioSyncManager
             // 
             this.groupBox2.Controls.Add(this.dataGridView1);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox2.Location = new System.Drawing.Point(0, 99);
+            this.groupBox2.Location = new System.Drawing.Point(0, 43);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(777, 422);
+            this.groupBox2.Size = new System.Drawing.Size(777, 478);
             this.groupBox2.TabIndex = 3;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "映射表";
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.progressBar1);
-            this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupBox1.Location = new System.Drawing.Point(0, 0);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(777, 99);
-            this.groupBox1.TabIndex = 2;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "检查结果";
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.progressBar1.Location = new System.Drawing.Point(3, 73);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(771, 23);
-            this.progressBar1.TabIndex = 1;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 35);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(259, 15);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "检查{0}条数据，成功{1}，失败{2}条";
+            this.groupBox2.Text = "异常记录表";
             // 
             // dataGridView1
             // 
@@ -104,16 +73,34 @@ namespace MinioSyncManager
             this.path,
             this.sourceSize,
             this.checkPath,
-            this.checkSize,
-            this.result});
+            this.checkSize});
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(3, 21);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 27;
-            this.dataGridView1.Size = new System.Drawing.Size(771, 398);
+            this.dataGridView1.Size = new System.Drawing.Size(771, 454);
             this.dataGridView1.TabIndex = 0;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.progressBar1);
+            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.groupBox1.Location = new System.Drawing.Point(0, 0);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(777, 43);
+            this.groupBox1.TabIndex = 2;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "检查结果";
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.progressBar1.Location = new System.Drawing.Point(3, 17);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(771, 23);
+            this.progressBar1.TabIndex = 2;
             // 
             // path
             // 
@@ -143,13 +130,6 @@ namespace MinioSyncManager
             this.checkSize.Name = "checkSize";
             this.checkSize.ReadOnly = true;
             // 
-            // result
-            // 
-            this.result.HeaderText = "检查结果";
-            this.result.MinimumWidth = 6;
-            this.result.Name = "result";
-            this.result.ReadOnly = true;
-            // 
             // FormCheck
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -162,9 +142,8 @@ namespace MinioSyncManager
             this.Text = "同步自检";
             this.Load += new System.EventHandler(this.FormCheck_Load);
             this.groupBox2.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -173,13 +152,11 @@ namespace MinioSyncManager
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.DataGridViewTextBoxColumn path;
         private System.Windows.Forms.DataGridViewTextBoxColumn sourceSize;
         private System.Windows.Forms.DataGridViewTextBoxColumn checkPath;
         private System.Windows.Forms.DataGridViewTextBoxColumn checkSize;
-        private System.Windows.Forms.DataGridViewTextBoxColumn result;
     }
 }

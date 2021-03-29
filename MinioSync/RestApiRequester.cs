@@ -24,6 +24,7 @@ namespace MinioSyncCore
             _uri = uri;
             _user = user;
             _psw = psw;
+            System.Net.ServicePointManager.DefaultConnectionLimit = 50;
             SetToken();
         }
 
@@ -130,6 +131,7 @@ namespace MinioSyncCore
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"{_uri}/{bucketName}/{path}");
             request.Method = "GET";
             request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36";
+            request.KeepAlive = true;
             WebResponse respone = request.GetResponse();
             Stream netStream = respone.GetResponseStream();
             return netStream;
@@ -142,18 +144,19 @@ namespace MinioSyncCore
         /// <param name="path"></param>
         /// <param name="contentType"></param>
         /// <param name="stream">minio文件流</param>
-        public string UploadFile(string bucketName, string path, string contentType,Stream stream)
+        public string UploadFile(string bucketName, string path, string contentType,Stream stream,long fileSize=0)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"{_uri}/minio/upload/{bucketName}/{path}");
             request.Method = "PUT";
             request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36";
             request.Headers["Authorization"] = $"Bearer {_token}";
-            request.Timeout = 60000;
             request.ContentType = contentType;
-
+            request.KeepAlive = true;
+            if (fileSize > 0)
+                request.ContentLength = fileSize;
             using (stream)
             {
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[102400];
                 int bytesRead = 0;
                 int offset = 0;
                 using (Stream reqStream = request.GetRequestStream())
@@ -163,31 +166,31 @@ namespace MinioSyncCore
                         reqStream.Write(buffer, 0, bytesRead);
                         offset += bytesRead;
                     }
-                }
-                //将文件内容写进内存流
-                string responseData = String.Empty;
-                try
-                {
-                    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                    //将文件内容写进内存流
+                    string responseData = String.Empty;
+                    try
                     {
-                        using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+                        using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                         {
-                            responseData = reader.ReadToEnd();
+                            using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+                            {
+                                responseData = reader.ReadToEnd();
+                            }
+                            if (responseData.Contains("error"))
+                                throw new InvalidOperationException(responseData);
+                            return responseData;
                         }
-                        if (responseData.Contains("error"))
-                            throw new InvalidOperationException(responseData);
-                        return responseData;
                     }
-                }
-                catch (System.Net.WebException ex)
-                {
-                    if (ex.Status == WebExceptionStatus.ProtocolError && ex.Message.Contains("401"))
+                    catch (System.Net.WebException ex)
                     {
-                        SetToken();
-                        return UploadFile(bucketName, path, contentType,stream);
+                        if (ex.Status == WebExceptionStatus.ProtocolError && ex.Message.Contains("401"))
+                        {
+                            SetToken();
+                            return UploadFile(bucketName, path, contentType, stream);
+                        }
+                        return ex.Message;
                     }
-                    return ex.Message;
-                }
+                }           
             }
         }
 
@@ -205,12 +208,14 @@ namespace MinioSyncCore
             request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36";
              request.Headers["Authorization"] = $"Bearer {_token}";
             request.ContentType = contentType;
+            request.KeepAlive = false;
             if (File.Exists(uploadPath) == false)
             {
                 throw new InvalidOperationException("上传文件路径不正确");
             }
             using (FileStream fileStream = new FileStream(uploadPath, FileMode.Open))
             {
+                request.ContentLength = fileStream.Length;
                 byte[] buffer = new byte[1024];
                 int bytesRead = 0;
                 int offset = 0;
@@ -221,31 +226,32 @@ namespace MinioSyncCore
                         reqStream.Write(buffer, 0, bytesRead);
                         offset += bytesRead;
                     }
-                }
-                //将文件内容写进内存流
-                string responseData = String.Empty;
-                try
-                {
-                    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                    //将文件内容写进内存流
+                    string responseData = String.Empty;
+                    try
                     {
-                        using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+                        using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                         {
-                            responseData = reader.ReadToEnd();
+                            using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+                            {
+                                responseData = reader.ReadToEnd();
+                            }
+                            if (responseData.Contains("error"))
+                                throw new InvalidOperationException(responseData);
+                            return responseData;
                         }
-                        if (responseData.Contains("error"))
-                            throw new InvalidOperationException(responseData);
-                        return responseData;
                     }
-                }
-                catch (System.Net.WebException ex)
-                {
-                    if (ex.Status == WebExceptionStatus.ProtocolError && ex.Message.Contains("401"))
+                    catch (System.Net.WebException ex)
                     {
-                        SetToken();
-                        return UploadFile(bucketName, path, contentType, uploadPath);
+                        if (ex.Status == WebExceptionStatus.ProtocolError && ex.Message.Contains("401"))
+                        {
+                            SetToken();
+                            return UploadFile(bucketName, path, contentType, uploadPath);
+                        }
+                        return ex.Message;
                     }
-                    return ex.Message;
                 }
+               
             }
         }
     }

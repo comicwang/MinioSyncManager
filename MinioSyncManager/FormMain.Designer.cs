@@ -115,7 +115,7 @@ namespace MinioSyncManager
             this.button1.Location = new System.Drawing.Point(861, 72);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(90, 26);
-            this.button1.TabIndex = 2;
+            this.button1.TabIndex = 4;
             this.button1.Text = "连接";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
@@ -128,7 +128,7 @@ namespace MinioSyncManager
             this.textBox3.Name = "textBox3";
             this.textBox3.PasswordChar = '●';
             this.textBox3.Size = new System.Drawing.Size(316, 25);
-            this.textBox3.TabIndex = 1;
+            this.textBox3.TabIndex = 3;
             this.textBox3.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // label3
@@ -147,7 +147,7 @@ namespace MinioSyncManager
             this.textBox2.Location = new System.Drawing.Point(115, 73);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(291, 25);
-            this.textBox2.TabIndex = 1;
+            this.textBox2.TabIndex = 2;
             this.textBox2.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // label2
@@ -252,7 +252,7 @@ namespace MinioSyncManager
             this.btnExcute.Location = new System.Drawing.Point(528, 6);
             this.btnExcute.Name = "btnExcute";
             this.btnExcute.Size = new System.Drawing.Size(90, 26);
-            this.btnExcute.TabIndex = 6;
+            this.btnExcute.TabIndex = 18;
             this.btnExcute.Text = "开始同步";
             this.btnExcute.UseVisualStyleBackColor = true;
             this.btnExcute.Click += new System.EventHandler(this.btnExcute_Click);
@@ -281,7 +281,7 @@ namespace MinioSyncManager
             this.btnChecked.Name = "btnChecked";
             this.btnChecked.Size = new System.Drawing.Size(90, 26);
             this.btnChecked.TabIndex = 2;
-            this.btnChecked.Text = "检测";
+            this.btnChecked.Text = "完整检测";
             this.btnChecked.UseVisualStyleBackColor = true;
             this.btnChecked.Click += new System.EventHandler(this.btnChecked_Click);
             // 
@@ -291,7 +291,7 @@ namespace MinioSyncManager
             this.linkLabel1.Location = new System.Drawing.Point(548, 36);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(67, 15);
-            this.linkLabel1.TabIndex = 4;
+            this.linkLabel1.TabIndex = 12;
             this.linkLabel1.TabStop = true;
             this.linkLabel1.Text = "选择目录";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
@@ -320,7 +320,7 @@ namespace MinioSyncManager
             this.btnTest.Location = new System.Drawing.Point(403, 59);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(90, 26);
-            this.btnTest.TabIndex = 2;
+            this.btnTest.TabIndex = 17;
             this.btnTest.Text = "测试";
             this.btnTest.UseVisualStyleBackColor = true;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
@@ -330,7 +330,7 @@ namespace MinioSyncManager
             this.txtTargetUri.Location = new System.Drawing.Point(92, 24);
             this.txtTargetUri.Name = "txtTargetUri";
             this.txtTargetUri.Size = new System.Drawing.Size(400, 25);
-            this.txtTargetUri.TabIndex = 0;
+            this.txtTargetUri.TabIndex = 14;
             this.txtTargetUri.TextChanged += new System.EventHandler(this.txtSourcePath_TextChanged);
             // 
             // label4
@@ -350,7 +350,7 @@ namespace MinioSyncManager
             this.txtTargetPwd.Name = "txtTargetPwd";
             this.txtTargetPwd.PasswordChar = '●';
             this.txtTargetPwd.Size = new System.Drawing.Size(118, 25);
-            this.txtTargetPwd.TabIndex = 1;
+            this.txtTargetPwd.TabIndex = 16;
             this.txtTargetPwd.TextChanged += new System.EventHandler(this.txtSourcePath_TextChanged);
             // 
             // label6
@@ -369,7 +369,7 @@ namespace MinioSyncManager
             this.txtTargetUser.Location = new System.Drawing.Point(92, 59);
             this.txtTargetUser.Name = "txtTargetUser";
             this.txtTargetUser.Size = new System.Drawing.Size(118, 25);
-            this.txtTargetUser.TabIndex = 1;
+            this.txtTargetUser.TabIndex = 15;
             this.txtTargetUser.TextChanged += new System.EventHandler(this.txtSourcePath_TextChanged);
             // 
             // label5
@@ -386,7 +386,7 @@ namespace MinioSyncManager
             this.txtBuckupPath.Location = new System.Drawing.Point(125, 30);
             this.txtBuckupPath.Name = "txtBuckupPath";
             this.txtBuckupPath.Size = new System.Drawing.Size(402, 25);
-            this.txtBuckupPath.TabIndex = 1;
+            this.txtBuckupPath.TabIndex = 11;
             this.txtBuckupPath.TextChanged += new System.EventHandler(this.txtSourcePath_TextChanged);
             // 
             // radioButton6
@@ -395,7 +395,7 @@ namespace MinioSyncManager
             this.radioButton6.Location = new System.Drawing.Point(43, 84);
             this.radioButton6.Name = "radioButton6";
             this.radioButton6.Size = new System.Drawing.Size(58, 19);
-            this.radioButton6.TabIndex = 0;
+            this.radioButton6.TabIndex = 13;
             this.radioButton6.Text = "迁移";
             this.radioButton6.UseVisualStyleBackColor = true;
             // 
@@ -406,7 +406,7 @@ namespace MinioSyncManager
             this.radioButton5.Location = new System.Drawing.Point(43, 34);
             this.radioButton5.Name = "radioButton5";
             this.radioButton5.Size = new System.Drawing.Size(58, 19);
-            this.radioButton5.TabIndex = 0;
+            this.radioButton5.TabIndex = 10;
             this.radioButton5.TabStop = true;
             this.radioButton5.Text = "备份";
             this.radioButton5.UseVisualStyleBackColor = true;
@@ -440,7 +440,7 @@ namespace MinioSyncManager
             this.radioButton4.Location = new System.Drawing.Point(153, 37);
             this.radioButton4.Name = "radioButton4";
             this.radioButton4.Size = new System.Drawing.Size(88, 19);
-            this.radioButton4.TabIndex = 0;
+            this.radioButton4.TabIndex = 9;
             this.radioButton4.Text = "指定路径";
             this.radioButton4.UseVisualStyleBackColor = true;
             this.radioButton4.CheckedChanged += new System.EventHandler(this.radioButton4_CheckedChanged);
@@ -452,7 +452,7 @@ namespace MinioSyncManager
             this.radioButton3.Location = new System.Drawing.Point(43, 37);
             this.radioButton3.Name = "radioButton3";
             this.radioButton3.Size = new System.Drawing.Size(58, 19);
-            this.radioButton3.TabIndex = 0;
+            this.radioButton3.TabIndex = 8;
             this.radioButton3.TabStop = true;
             this.radioButton3.Text = "全部";
             this.radioButton3.UseVisualStyleBackColor = true;
@@ -497,7 +497,7 @@ namespace MinioSyncManager
             this.numericUpDown1.Location = new System.Drawing.Point(77, 19);
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(175, 25);
-            this.numericUpDown1.TabIndex = 3;
+            this.numericUpDown1.TabIndex = 7;
             this.numericUpDown1.Value = new decimal(new int[] {
             10,
             0,
@@ -510,7 +510,7 @@ namespace MinioSyncManager
             this.radioButton2.Location = new System.Drawing.Point(153, 39);
             this.radioButton2.Name = "radioButton2";
             this.radioButton2.Size = new System.Drawing.Size(58, 19);
-            this.radioButton2.TabIndex = 0;
+            this.radioButton2.TabIndex = 6;
             this.radioButton2.Text = "增量";
             this.radioButton2.UseVisualStyleBackColor = true;
             this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
@@ -522,7 +522,7 @@ namespace MinioSyncManager
             this.radioButton1.Location = new System.Drawing.Point(43, 39);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(58, 19);
-            this.radioButton1.TabIndex = 0;
+            this.radioButton1.TabIndex = 5;
             this.radioButton1.TabStop = true;
             this.radioButton1.Text = "全量";
             this.radioButton1.UseVisualStyleBackColor = true;
