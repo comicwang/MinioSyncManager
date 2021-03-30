@@ -19,6 +19,7 @@ namespace MinioSyncManager
         public FormMain()
         {
             InitializeComponent();
+            LogHelper.Info("111");
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -320,6 +321,40 @@ namespace MinioSyncManager
                         SyncDoc(strs[0], docResult, ref current, ref dateTime);
                     }
                 }
+
+                //重复处理上传失败的文件
+                int errorCount = _errorUploads.Count;
+                if (errorCount > 0)
+                {
+                    int successCount = 0;
+                    backgroundWorker1.ReportProgress(0, $"开始处理上传异常的数据,共计{errorCount}条..");
+                    while (_errorUploads.Count > 0)
+                    {
+                        MinioResult minioResult = _errorUploads.Dequeue();
+                        backgroundWorker1.ReportProgress(0, $"正在处理上传异常的数据{minioResult.bucketName}-{minioResult.docResult.name}..");
+                        try
+                        {
+                            Stream stream = _restApi.GetFileStream(minioResult.bucketName, minioResult.docResult.name);
+                            string response = _tragetrestApi.UploadFile(minioResult.bucketName, minioResult.docResult.name, minioResult.docResult.contentType, stream, minioResult.docResult.size);
+                            if (response == "")
+                            {
+                                successCount++;
+                                backgroundWorker1.ReportProgress(successCount * 100 / errorCount, $"文件{minioResult.bucketName}-{minioResult.docResult.name}上传完成（{successCount}/{errorCount}）\n当前队列存在{_errorUploads.Count}条数据");
+                            }
+                            //兼容超时问题，下载文件再上传
+                            else
+                            {
+                                throw new InvalidOperationException("上传失败," + response);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            backgroundWorker1.ReportProgress(successCount * 100 / errorCount, $"文件{minioResult.bucketName}-{minioResult.docResult.name}上传失败:{ex.Message}）,重新加入队列，当前队列存在{_errorUploads.Count}条数据");
+                            _errorUploads.Enqueue(minioResult);
+                        }
+
+                    }
+                }
                 e.Result = dateTime;
             }
         }
@@ -327,6 +362,11 @@ namespace MinioSyncManager
         private int _fileCount = 0;
 
         private List<DocResult> _currentTargetResults = new List<DocResult>();
+
+        /// <summary>
+        /// 记录异常数据
+        /// </summary>
+        private Queue<MinioResult> _errorUploads = new Queue<MinioResult>();
 
         /// <summary>
         /// 递归迁移处理Doc
@@ -385,29 +425,38 @@ namespace MinioSyncManager
                 {
                     try
                     {
-                        backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"开始上传文件{docResult.name}（{total}/{_fileCount}）");
+                        backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"开始上传文件{bucketName}-{docResult.name}（{total}/{_fileCount}）");
                         Stream stream = _restApi.GetFileStream(bucketName, docResult.name);
                         string response = _tragetrestApi.UploadFile(bucketName, docResult.name, docResult.contentType, stream,docResult.size);
                         if (response == "")
-                            backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{docResult.name}上传完成（{total}/{_fileCount}）");
+                            backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{bucketName}-{docResult.name}上传完成（{total}/{_fileCount}）");
                         //兼容超时问题，下载文件再上传
                         else
                         {
-                            backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{docResult.name}上传失败:{response},开始尝试本地下载上传方式（{total}/{_fileCount}）");
+                            backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{bucketName}-{docResult.name}上传失败:{response},开始尝试本地下载上传方式（{total}/{_fileCount}）");
                             string tmp = CreateTempPath(bucketName, docResult.name);
                             _restApi.DownloadFile(bucketName, docResult.name, tmp);
                             response = _tragetrestApi.UploadFile(bucketName, docResult.name, docResult.contentType, tmp);
                             if (response == "")
-                                backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{docResult.name}上传完成（{total}/{_fileCount}）");
+                                backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{bucketName}-{docResult.name}上传完成（{total}/{_fileCount}）");
                             else
-                                backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{docResult.name}上传失败:{response}（{total}/{_fileCount}）");
+                            {
+                                backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{bucketName}-{docResult.name}上传失败:{response}（{total}/{_fileCount}）");
+                                throw new InvalidOperationException("重复本地上传失败");
+                            }
                         }
                         if (dateTime < docResult.lastModified.AddHours(8))
                             dateTime = docResult.lastModified.AddHours(8);
                     }
                     catch (Exception ex)
                     {
-                        backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"上传文件{docResult.name}失败:{ex.Message}");
+                        backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"上传文件{bucketName}-{docResult.name}失败:{ex.Message}");
+
+                        _errorUploads.Enqueue(new MinioResult()
+                        {
+                            docResult = docResult,
+                            bucketName = bucketName
+                        });
                     }
                 }
 
@@ -527,6 +576,14 @@ namespace MinioSyncManager
                 progressBar1.Value = e.ProgressPercentage;
                 textBox9.AppendText($"{e.UserState}\n");
                 lblMessage.Text = e.UserState.ToString();
+            }
+            if (e.UserState.ToString().Contains("失败"))
+            {
+                LogHelper.Error(e.UserState.ToString());
+            }
+            else
+            {
+                LogHelper.Info(e.UserState.ToString());
             }
         }
 

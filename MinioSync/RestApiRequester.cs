@@ -188,6 +188,7 @@ namespace MinioSyncCore
                             SetToken();
                             return UploadFile(bucketName, path, contentType, stream);
                         }
+                        LogHelper.Error($"{bucketName}-{path}上传失败:{ex.Message}", ex);
                         return ex.Message;
                     }
                 }           
@@ -248,6 +249,7 @@ namespace MinioSyncCore
                             SetToken();
                             return UploadFile(bucketName, path, contentType, uploadPath);
                         }
+                        LogHelper.Error($"{bucketName}-{path}上传失败:{ex.Message}", ex);
                         return ex.Message;
                     }
                 }

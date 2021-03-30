@@ -92,6 +92,13 @@ namespace MinioSyncCore
         public string pwd { get; set; }
     }
 
+    public class MinioResult
+    {
+        public DocResult docResult { get; set; }
+
+        public string bucketName { get; set; }
+    }
+
     public class DocResult
     {
         public string name { get; set; }
