@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Minio;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace MinioSyncCore
         private string _uri = string.Empty;
         private string _user = string.Empty;
         private string _psw = string.Empty;
+        private MinioClient _client = null;
+
         /// <summary>
         /// 构建一个WebRpc请求器，并请求Token信息
         /// </summary>
@@ -24,7 +27,7 @@ namespace MinioSyncCore
             _uri = uri;
             _user = user;
             _psw = psw;
-            System.Net.ServicePointManager.DefaultConnectionLimit = 50;
+            _client = new MinioClient(new Uri(uri).Authority, user, psw);
             SetToken();
         }
 
@@ -120,6 +123,11 @@ namespace MinioSyncCore
             }
         }
 
+        public void DownloadFileBySDK(string bucketName, string path, string savePath)
+        {
+            _client.GetObjectAsync(bucketName, path, savePath).Wait();
+        }
+
         /// <summary>
         /// 获取Minio文件流信息
         /// </summary>
@@ -137,6 +145,28 @@ namespace MinioSyncCore
             return netStream;
         }
 
+        public void GetFileStreamBySDK(string bucketName,string path,Action<Stream> action)
+        {
+            _client.GetObjectAsync(bucketName, path, action).Wait();
+        }
+
+        /// <summary>
+        /// 根据SDK上传文件
+        /// </summary>
+        /// <param name="bucketName"></param>
+        /// <param name="path"></param>
+        /// <param name="contentType"></param>
+        /// <param name="uploadPath"></param>
+        public void UploadFileBySDK(string bucketName,string path,string contentType,string uploadPath)
+        {
+            _client.PutObjectAsync(bucketName, path, uploadPath, contentType).Wait();
+        }
+
+        public void UploadFileBySDK(string bucketName, string path, Stream stream, long fileSize)
+        {
+            _client.PutObjectAsync(bucketName, path, stream, fileSize).Wait();
+        }
+
         /// <summary>
         /// 上传Minio文件到Minio
         /// </summary>
@@ -144,11 +174,14 @@ namespace MinioSyncCore
         /// <param name="path"></param>
         /// <param name="contentType"></param>
         /// <param name="stream">minio文件流</param>
-        public string UploadFile(string bucketName, string path, string contentType,Stream stream,long fileSize=0)
+        public string UploadFile(string bucketName, string path, string contentType, Stream stream, long fileSize = 0)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"{_uri}/minio/upload/{bucketName}/{path}");
             request.Method = "PUT";
             request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36";
+            request.Accept = "*/*";
+            request.Referer = $"{_uri}/minio/{bucketName}/{path.Remove(path.LastIndexOf('/'))}";
+            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
             request.Headers["Authorization"] = $"Bearer {_token}";
             request.ContentType = contentType;
             request.KeepAlive = true;
@@ -191,7 +224,7 @@ namespace MinioSyncCore
                         LogHelper.Error($"{bucketName}-{path}上传失败:{ex.Message}", ex);
                         return ex.Message;
                     }
-                }           
+                }
             }
         }
 

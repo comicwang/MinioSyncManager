@@ -19,7 +19,6 @@ namespace MinioSyncManager
         public FormMain()
         {
             InitializeComponent();
-            LogHelper.Info("111");
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -334,18 +333,10 @@ namespace MinioSyncManager
                         backgroundWorker1.ReportProgress(0, $"正在处理上传异常的数据{minioResult.bucketName}-{minioResult.docResult.name}..");
                         try
                         {
-                            Stream stream = _restApi.GetFileStream(minioResult.bucketName, minioResult.docResult.name);
-                            string response = _tragetrestApi.UploadFile(minioResult.bucketName, minioResult.docResult.name, minioResult.docResult.contentType, stream, minioResult.docResult.size);
-                            if (response == "")
+                            _restApi.GetFileStreamBySDK(minioResult.bucketName, minioResult.docResult.name, t =>
                             {
-                                successCount++;
-                                backgroundWorker1.ReportProgress(successCount * 100 / errorCount, $"文件{minioResult.bucketName}-{minioResult.docResult.name}上传完成（{successCount}/{errorCount}）\n当前队列存在{_errorUploads.Count}条数据");
-                            }
-                            //兼容超时问题，下载文件再上传
-                            else
-                            {
-                                throw new InvalidOperationException("上传失败," + response);
-                            }
+                                _tragetrestApi.UploadFileBySDK(minioResult.bucketName, minioResult.docResult.name, t, minioResult.docResult.size);
+                            });
                         }
                         catch (Exception ex)
                         {
@@ -395,6 +386,13 @@ namespace MinioSyncManager
                     }
                     DocResult[] results = _restApi.GetObjects(bucketName, docResult.name);
                     var tempObjs = _tragetrestApi.GetObjects(bucketName, docResult.name);
+                    //文件数量一致，跳过文件遍历
+                    if (results.Count(t => t.contentType != "") == tempObjs.Count(s => s.contentType != ""))
+                    {
+                        results = results.Where(t => t.contentType == "").ToArray();
+                        tempObjs = tempObjs.Where(t => t.contentType == "").ToArray();
+                    }
+
                     if (tempObjs != null && tempObjs.Length > 0)
                         _currentTargetResults.AddRange(tempObjs.Where(t => t.contentType != ""));
                     //文件时间比较
@@ -425,11 +423,11 @@ namespace MinioSyncManager
                 {
                     try
                     {
-                        backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"开始上传文件{bucketName}-{docResult.name}（{total}/{_fileCount}）");
+                        backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"开始上传文件{bucketName}-{docResult.name}（{total}/{_fileCount}）");                       
                         Stream stream = _restApi.GetFileStream(bucketName, docResult.name);
                         string response = _tragetrestApi.UploadFile(bucketName, docResult.name, docResult.contentType, stream,docResult.size);
                         if (response == "")
-                            backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{bucketName}-{docResult.name}上传完成（{total}/{_fileCount}）");
+                        backgroundWorker1.ReportProgress(total * 100 / _fileCount, $"文件{bucketName}-{docResult.name}上传完成（{total}/{_fileCount}）");
                         //兼容超时问题，下载文件再上传
                         else
                         {
